@@ -37,7 +37,7 @@ const Div = styled.div`
 `
 
 
-const Tags = () => {
+const Tags = ( {onTagSelect} ) => {
     return(
         <>
         <TagContainer>
@@ -45,7 +45,7 @@ const Tags = () => {
 
             <Div>
             {tags.map( (tag) =>{
-                    return <ButtonTag key={tag.id}>{tag.titulo}</ButtonTag>
+                    return <ButtonTag key={tag.id} onClick={ () => onTagSelect(tag.id)} >{tag.titulo}</ButtonTag>
                 } )}
             </Div>
             

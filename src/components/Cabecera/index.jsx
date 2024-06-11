@@ -11,12 +11,12 @@ const HeaderEstilizado = styled.header`
     }
 `
 
-const Cabecera = () => {
+const Cabecera = ({ onSearch }) => {
     return(
         <>
             <HeaderEstilizado>
                 <img className="logo" src="img/logo.png" alt="logo de space app" />
-                <CampoTexto />
+                <CampoTexto onChange={(e) => onSearch(e.target.value)}/>
             </HeaderEstilizado>
         </>
     )

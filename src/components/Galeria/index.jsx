@@ -3,6 +3,7 @@ import Titulo from "../Titulo"
 import Populares from "./Populares"
 import Imagen from "./Imagen"
 import Tag from "./Tags"
+import { useState } from "react"
 
 const GaleriaContainer = styled.div`
 display: flex;
@@ -20,11 +21,30 @@ const ImagenesContainer = styled.section`
 `
 
 
-const Galeria = ({ fotos = [], alSeleccionarFoto, alAlternarFavorito }) => {
+const Galeria = ({ fotos = [], alSeleccionarFoto, alAlternarFavorito, terminoBusqueda  }) => {
 
+    const [tagSeleccionado, setTagSeleccionado] = useState(null);
+
+    // const fotosFiltradas = fotos.filter(foto => {
+    //     return (
+    //       (tagSeleccionado === null || foto.tagId === tagSeleccionado) &&
+    //       (terminoBusqueda === "" || foto.titulo.toLowerCase().includes(terminoBusqueda.toLowerCase()))
+    //     );
+    //   });
+    
+
+    const fotosFiltradasPorTag = tagSeleccionado
+      ? fotos.filter((foto) => foto.tagId === tagSeleccionado)
+      : fotos;
+
+      const fotosFiltradas = fotosFiltradasPorTag.filter(foto =>
+        terminoBusqueda === "" || foto.titulo.toLowerCase().includes(terminoBusqueda.toLowerCase())
+      );
+
+  
     return (
         <>
-            <Tag />
+            <Tag onTagSelect={setTagSeleccionado} />
 
             <GaleriaContainer>
 
@@ -32,7 +52,7 @@ const Galeria = ({ fotos = [], alSeleccionarFoto, alAlternarFavorito }) => {
 
                     <Titulo>Navegue por la galería</Titulo>
                     <ImagenesContainer>
-                        {fotos.map(foto => 
+                        {fotosFiltradas.map(foto => 
                         <Imagen
                             alAlternarFavorito ={alAlternarFavorito}
                             alSolicitarZoom={alSeleccionarFoto}
