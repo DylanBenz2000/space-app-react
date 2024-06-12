@@ -5,10 +5,9 @@ import BarraLateral from "./components/BarraLateral";
 import Banner from "./components/Banner";
 import banner from "./assets/banner.png";
 import Galeria from "./components/Galeria";
-import fotos from "./fotos.json"
-import { useState } from "react";
 import ModalZoom from "./components/ModalZoom";
 import Pie from "./components/Pie";
+import GlobalContextProvider from "./context/GlobalContext";
 
 
 const FondoGradiente = styled.div`
@@ -38,56 +37,28 @@ const ContenidoGaleria = styled.section`
 
 const App = () => {
 
-  const [fotosDeGaleria, setFotosDeGaleria] = useState(fotos);
-  const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
-  const [terminoBusqueda, setTerminoBusqueda] = useState("");
-
-  const alAlternarFavorito = (foto) =>{
-
-    if(foto.id === fotoSeleccionada?.id){
-      setFotoSeleccionada({
-        ...fotoSeleccionada,
-        favorita: !foto.favorita
-      })
-    }
-
-    setFotosDeGaleria(fotosDeGaleria.map(fotoDeLaGaleria =>{
-      return {
-        ...fotoDeLaGaleria,
-        favorita: fotoDeLaGaleria.id === foto.id ? !foto.favorita : fotoDeLaGaleria.favorita 
-      }
-    }))
-  }
-
-
-
 
   return (
     <>
     <FondoGradiente>
       <GlobalStyles />
-      <AppContainer>
-        <Cabecera onSearch={setTerminoBusqueda} />
-        <MainContainer>
-          <BarraLateral />
-          <ContenidoGaleria>
-            <Banner
-              texto="La galería más completa de fotos del espacio"
-              backgroundImage={banner}
-            />
-            <Galeria 
-              alSeleccionarFoto={foto =>setFotoSeleccionada(foto)} 
-              fotos={fotosDeGaleria} 
-              alAlternarFavorito={alAlternarFavorito}
-              terminoBusqueda={terminoBusqueda}
-            />
-          </ContenidoGaleria>
-        </MainContainer>
-      </AppContainer>
-      <ModalZoom alAlternarFavorito={alAlternarFavorito} foto={fotoSeleccionada} alCerrar={ () => {
-        setFotoSeleccionada(null);
-      }}/>
-      <Pie />
+      <GlobalContextProvider>
+        <AppContainer>
+          <Cabecera />
+          <MainContainer>
+            <BarraLateral />
+            <ContenidoGaleria>
+              <Banner
+                texto="La galería más completa de fotos del espacio"
+                backgroundImage={banner}
+              /> 
+              <Galeria />
+            </ContenidoGaleria>
+          </MainContainer>
+        </AppContainer>
+        <ModalZoom />
+        <Pie />
+      </GlobalContextProvider>
     </FondoGradiente>
 
     </>

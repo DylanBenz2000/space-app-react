@@ -3,7 +3,9 @@ import Titulo from "../Titulo"
 import Populares from "./Populares"
 import Imagen from "./Imagen"
 import Tag from "./Tags"
-import { useState } from "react"
+import Cargando from "../Cargando"
+import { useContext } from "react"
+import { GlobalContext } from "../../context/GlobalContext"
 
 const GaleriaContainer = styled.div`
 display: flex;
@@ -21,30 +23,21 @@ const ImagenesContainer = styled.section`
 `
 
 
-const Galeria = ({ fotos = [], alSeleccionarFoto, alAlternarFavorito, terminoBusqueda  }) => {
+const Galeria = () => {
 
-    const [tagSeleccionado, setTagSeleccionado] = useState(null);
-
-    // const fotosFiltradas = fotos.filter(foto => {
-    //     return (
-    //       (tagSeleccionado === null || foto.tagId === tagSeleccionado) &&
-    //       (terminoBusqueda === "" || foto.titulo.toLowerCase().includes(terminoBusqueda.toLowerCase()))
-    //     );
-    //   });
+    const { fotosDeGaleria, consulta, alAlternarFavorito, setFotoSeleccionada } = useContext(GlobalContext)
     
+    // const [tagSeleccionado, setTagSeleccionado] = useState(null);
 
-    const fotosFiltradasPorTag = tagSeleccionado
-      ? fotos.filter((foto) => foto.tagId === tagSeleccionado)
-      : fotos;
+    // const fotosFiltradas = tagSeleccionado
+    //   ? fotos.filter((foto) => foto.tagId === tagSeleccionado)
+    //   : fotos;
 
-      const fotosFiltradas = fotosFiltradasPorTag.filter(foto =>
-        terminoBusqueda === "" || foto.titulo.toLowerCase().includes(terminoBusqueda.toLowerCase())
-      );
-
-  
     return (
+        fotosDeGaleria.length == 0 ?
+        <Cargando></Cargando>:
         <>
-            <Tag onTagSelect={setTagSeleccionado} />
+            <Tag/>
 
             <GaleriaContainer>
 
@@ -52,10 +45,13 @@ const Galeria = ({ fotos = [], alSeleccionarFoto, alAlternarFavorito, terminoBus
 
                     <Titulo>Navegue por la galería</Titulo>
                     <ImagenesContainer>
-                        {fotosFiltradas.map(foto => 
+                        {fotosDeGaleria.filter( foto => {
+                            return consulta == '' || foto.titulo.toLocaleLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").includes(consulta.toLocaleLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""))
+                        })
+                        .map(foto => 
                         <Imagen
-                            alAlternarFavorito ={alAlternarFavorito}
-                            alSolicitarZoom={alSeleccionarFoto}
+                            alAlternarFavorito={alAlternarFavorito}
+                            alSolicitarZoom={foto => setFotoSeleccionada(foto)}
                             key={foto.id}
                             foto={foto} 
                         />)
