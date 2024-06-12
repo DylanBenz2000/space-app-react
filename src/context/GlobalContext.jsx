@@ -1,48 +1,74 @@
-import { createContext } from "react";
-import { useState, useEffect } from "react";
+import { createContext, useReducer } from "react";
+import { useEffect } from "react";
 
 export const GlobalContext = createContext();
 
+const initialState = {
+    consulta: '',
+    fotosDeGaleria : [],
+    fotoSeleccionada : null
+}
+// Es el encargado de definir las acciones que se van a ejecutar cuando se llamen a los eventos
+
+const reducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_CONSULTA':
+            return { ...state, consulta: action.payload };
+        case 'SET_FOTOS_DE_GALERIA':
+            return { ...state, fotosDeGaleria: action.payload };
+        case 'SET_FOTO_SELECCIONADA':
+            return { ...state, fotoSeleccionada: action.payload };
+        case 'ALTERNAR_FAVORITO':
+
+        const fotosDeGaleria = state.fotosDeGaleria.map( fotosDeGaleria => {
+            return{
+                ...fotosDeGaleria,
+                favorita: fotosDeGaleria.id === action.payload.id ? !action.payload.favorita: fotosDeGaleria.favorita
+            }
+        })
+
+            if (action.payload.id === state.fotoSeleccionada?.id) {
+                return {
+                    ...state,
+                    fotosDeGaleria: fotosDeGaleria,
+                    fotoSeleccionada: {
+                        ...state.fotoSeleccionada, favorita: !state.fotoSeleccionada.favorita
+                    }
+                }
+            } else {
+                return {
+                    ...state, fotosDeGaleria: fotosDeGaleria
+                }
+            }
+        default:
+            return state;
+    }
+};
+
 const GlobalContextProvider = ({children}) => {
-    const [consulta, setConsulta] = useState('')
-    const [fotosDeGaleria, setFotosDeGaleria] = useState([]);
-    const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
+
+
+    const [state, dispatch] = useReducer(reducer,initialState)
+
+    // const [consulta, setConsulta] = useState('')
+    // const [fotosDeGaleria, setFotosDeGaleria] = useState([]);
+    // const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
 
     useEffect(() => {
         const getData = async () => {
           const response = await fetch('http://localhost:3000/fotos');
           const data = await response.json();
-          setFotosDeGaleria([...data]); //Con el spread operator creamos un nuevo arreglo
+          dispatch({ type: 'SET_FOTOS_DE_GALERIA', payload: data })
+        //   setFotosDeGaleria([...data]); //Con el spread operator creamos un nuevo arreglo
         };
         setTimeout( () => getData(), 5000);
       }, [])
 
-      const alAlternarFavorito = (foto) =>{
 
-        if(foto.id === fotoSeleccionada?.id){
-          setFotoSeleccionada({
-            ...fotoSeleccionada,
-            favorita: !foto.favorita
-          })
-        }
-    
-        setFotosDeGaleria(fotosDeGaleria.map(fotoDeLaGaleria =>{
-          return {
-            ...fotoDeLaGaleria,
-            favorita: fotoDeLaGaleria.id === foto.id ? !foto.favorita : fotoDeLaGaleria.favorita 
-          }
-        }))
-      }
+
 
     return(
-        <GlobalContext.Provider value={{ 
-            consulta, 
-            setConsulta, 
-            fotosDeGaleria, 
-            fotoSeleccionada, 
-            setFotoSeleccionada,
-            alAlternarFavorito
-            }}>
+        <GlobalContext.Provider value={{ state, dispatch }}>
             {children}
         </GlobalContext.Provider>
     )
